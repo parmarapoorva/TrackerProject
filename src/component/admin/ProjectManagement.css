@@ -1,0 +1,232 @@
+/* ======== Main Container ======== */
+.project-management {
+    padding: 40px;
+    background: #f0f2f5;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* ======== Header Section ======== */
+.header {
+    background: #007bff;
+    color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title {
+    font-size: 32px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.header-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    padding: 12px 30px;
+    font-size: 16px;
+    background: #28a745;
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    transition: all 0.3s;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.header-btn:hover {
+    background: #218838;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ======== Project Cards ======== */
+.project-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    margin-bottom: 30px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.project-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.project-card-body {
+    padding: 40px;
+    line-height: 1.8;
+}
+
+.project-card-title {
+    font-size: 10px;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 12px;
+    transition: color 0.3s;
+}
+
+.project-card-title:hover {
+    color: #0056b3;
+}
+
+.project-card-description {
+    font-size: 18px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* ======== Details Section ======== */
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 16px;
+    color: #444;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+}
+
+.detail-item i {
+    color: #007bff;
+    font-size: 20px;
+}
+
+/* ======== Buttons ======== */
+.btn {
+    display: inline-block;
+    padding: 14px 36px;
+    font-size: 17px;
+    font-weight: bold;
+    color: #fff;
+    background: #17a2b8;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #138496;
+    transform: scale(1.05);
+}
+
+/* ======== Status Badges ======== */
+.badge {
+    font-size: 14px;
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge-success {
+    background: #28a745 !important;
+    color: #fff !important;
+}
+
+.badge-warning {
+    background: #ffc107 !important;
+    color: #fff !important;
+}
+
+/* ======== Form Inputs ======== */
+.input, .textarea {
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    color: #333;
+}
+
+.input:focus, .textarea:focus {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: none;
+    border: 1px solid #007bff;
+}
+
+/* ======== Action Buttons ======== */
+.btn-success {
+    background: #28a745;
+    color: white;
+    transition: all 0.3s;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: scale(1.05);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    transition: all 0.3s;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* ======== Smooth Animations ======== */
+.card, .btn, .list-group-item, .details-section, .input, .textarea {
+    transition: all 0.3s ease;
+}
+
+/* ======== Mobile Responsiveness ======== */
+@media (max-width: 992px) {
+    .project-management {
+        padding: 20px;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .project-card {
+        margin-bottom: 25px;
+    }
+
+    .project-card-body {
+        padding: 25px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+/* ======== Hover Effects ======== */
+.project-card:hover .project-card-title {
+    color: #0056b3;
+    transition: color 0.3s;
+}
+
+.project-card:hover .btn {
+    background: #138496;
+}

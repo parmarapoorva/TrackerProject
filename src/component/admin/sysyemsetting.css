@@ -1,0 +1,41 @@
+/* System Settings Custom Styling */
+.container {
+    max-width: 1200px;
+  }
+  
+  .card {
+    transition: all 0.3s ease-in-out;
+    border-radius: 12px;
+  }
+  
+  .card:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  h2 {
+    color: #4CAF50;
+  }
+  
+  .btn {
+    border-radius: 25px;
+    padding: 10px 20px;
+  }
+  
+  .form-switch label {
+    font-weight: bold;
+  }
+  
+  .alert {
+    animation: fadeIn 0.5s;
+  }
+  
+  /* Animation for success message */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  

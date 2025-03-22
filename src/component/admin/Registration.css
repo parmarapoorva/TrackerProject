@@ -1,0 +1,237 @@
+/* Importing Google Fonts - Poppins */
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap'); */
+/* * {
+  margin: 10px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+
+}  */
+/* Main App Background */
+.app-main {
+  /* background-image: url("./images/bcadd.jpeg"); */
+  /* background-color: rgb(182, 63, 63); */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  max-width:700px;
+  height: 100vh;
+  /* background-image: url("./images/appmain.avif"); */
+}
+
+/* Overlay Effect (Fixes opacity issue) */
+/* .app-main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-color: #fff;
+} */
+
+/* Container Styling */
+/* Main Container */
+.container {
+  /* background: linear-gradient(135deg, rgba(244, 246, 247, 0.9), rgba(155, 89, 182, 0.9)); */
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #f8f7f7;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0);
+  transition: all 0.3s ease-in-out;
+  z-index: 2;
+  position: relative;
+  width: 100%;
+  margin-top: 10%;
+  max-width: 900px;
+  overflow: hidden; /* Prevents border overflow */
+}
+
+/* Rotating Border */
+.container::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  /* background: linear-gradient(45deg, #ff5733, #f4d03f, #1fb7d2, #9b59b6); */
+  border-radius: 12px;
+  z-index: -1;
+  animation: rotateBorder 5s linear infinite;
+}
+
+/* Keyframes for Rotating Effect */
+@keyframes rotateBorder {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hover Effect */
+/* .container:hover {
+  transform: scale(1.03);
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.3);
+} */
+
+
+/* Hover Effect */
+/* .container:hover {
+  transform: scale(1.01);
+  
+} */
+
+/* /* } */
+/* body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+} */ */
+.container {
+  max-width: 500px;
+  width: 100%;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+  margin: 10%;
+
+}
+
+
+.container .title {
+  font-size: 25px;
+  font-weight: 500;
+  position: relative;
+}
+.container .title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 200px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #1980c5, #9b59b6);
+}
+.content form .user-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 20px 0 12px 0;
+}
+form .user-details .input-box {
+  margin-bottom: 15px;
+  width: calc(100% / 2 - 20px);
+}
+form .input-box span.details {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.user-details .input-box input {
+  height: 45px;
+  width: 100%;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding-left: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+}
+.user-details .input-box input:focus,
+.user-details .input-box input:valid {
+  border-color: #471def;
+}
+form .gender-details .gender-title {
+  font-size: 20px;
+  font-weight: 500;
+}
+form .category {
+  display: flex;
+  width: 80%;
+  margin: 14px 0;
+  justify-content: space-between;
+}
+form .category label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+form .category label .dot {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background: #d9d9d9;
+  border: 5px solid transparent;
+  transition: all 0.3s ease;
+}
+#dot-1:checked~.category label .one,
+#dot-2:checked~.category label .two,
+#dot-3:checked~.category label .three {
+  background: #9b59b6;
+  border-color: #d9d9d9;
+}
+form input[type="radio"] {
+  display: none;
+}
+form .button {
+  height: 45px;
+  margin: 35px 0
+}
+form .button input {
+  height: 100%;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.4s ease-in, transform 0.2s ease-in-out;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+
+/* Hover Effect with Smooth Animation */
+/* form .button input:hover {
+  background: linear-gradient(-135deg, #71b7e6, #9b59b6);
+  transform: scale(1.05); /* Slight pop-out effect */
+/* } */
+
+/* Responsive media query code for mobile devices */
+@media(max-width: 584px) {
+  .container {
+    max-width: 100%;
+  }
+  form .user-details .input-box {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  form .category {
+    width: 100%;
+  }
+  .content form .user-details {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+  .user-details::-webkit-scrollbar {
+    width: 5px;
+  }
+}
+/* Responsive media query code for mobile devices */
+@media(max-width: 459px) {
+  .container .content .category {
+    flex-direction: column;
+  }
+}
