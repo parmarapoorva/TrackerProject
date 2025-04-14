@@ -12,10 +12,14 @@ const app = express();
 
 // ✅ Middleware
 app.use(cors({
-    origin: "http://localhost:5173", // Frontend URL
+    origin: [
+      "https://trackerproject-frontend.onrender.com",
+      "http://localhost:5173"  // For local testing
+    ],
     methods: "GET,POST,PUT,DELETE",
     credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 

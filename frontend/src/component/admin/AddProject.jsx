@@ -6,24 +6,28 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import "./AddProject.css";  // Custom CSS file
 
+const API_BASE_URL = "https://trackerproject-backend.onrender.com";  // ✅ Render Backend URL
+
 const AddProject = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const navigate = useNavigate();
     const [managers, setManagers] = useState([]);
 
+    // 🚀 Fetch Managers from Backend
     useEffect(() => {
         const fetchManagers = async () => {
             try {
-                const response = await axios.get("http://localhost:9000/api/users/managers");
+                const response = await axios.get(`${API_BASE_URL}/api/users/managers`);
                 setManagers(response.data);
             } catch (error) {
                 console.error("Failed to fetch managers:", error);
-                toast.error("Failed to fetch managers");
+                toast.error("❌ Failed to fetch managers");
             }
         };
         fetchManagers();
     }, []);
 
+    // 🔥 Handle Project Form Submission
     const handleRegistration = async (data) => {
         const formData = new FormData();
         formData.append("projectId", Date.now());
@@ -37,8 +41,14 @@ const AddProject = () => {
         formData.append("status", data.status);
         formData.append("managerId", data.managerId);
 
+        // ✅ Date Validation: Ensure Start Date is before Completion Date
+        if (new Date(data.startDate) > new Date(data.completionDate)) {
+            toast.error("❌ Start date cannot be after completion date!");
+            return;
+        }
+
         try {
-            await axios.post("http://localhost:9000/api/projects/add-project", formData, {
+            await axios.post(`${API_BASE_URL}/api/projects/add-project`, formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
 
@@ -49,7 +59,8 @@ const AddProject = () => {
 
             reset();
         } catch (error) {
-            toast.error("❌ Project Addition Failed: " + (error.response?.data?.message || "Unknown error"));
+            console.error("Project Addition Error:", error);
+            toast.error(`❌ Project Addition Failed: ${error.response?.data?.message || "Unknown error"}`);
         }
     };
 
@@ -59,6 +70,7 @@ const AddProject = () => {
                 <h2 className="form-title">Add Project</h2>
 
                 <form onSubmit={handleSubmit(handleRegistration)} encType="multipart/form-data">
+                    {/* Project Name */}
                     <div className="form-group">
                         <label>Project Name</label>
                         <input
@@ -69,6 +81,7 @@ const AddProject = () => {
                         {errors.pname && <p className="error">{errors.pname.message}</p>}
                     </div>
 
+                    {/* Description */}
                     <div className="form-group">
                         <label>Description</label>
                         <textarea
@@ -78,6 +91,7 @@ const AddProject = () => {
                         {errors.description && <p className="error">{errors.description.message}</p>}
                     </div>
 
+                    {/* Technology */}
                     <div className="form-group">
                         <label>Technology</label>
                         <input
@@ -88,6 +102,7 @@ const AddProject = () => {
                         {errors.technology && <p className="error">{errors.technology.message}</p>}
                     </div>
 
+                    {/* Estimated Hours */}
                     <div className="form-group">
                         <label>Estimated Hours</label>
                         <input
@@ -98,6 +113,7 @@ const AddProject = () => {
                         {errors.estimatedHours && <p className="error">{errors.estimatedHours.message}</p>}
                     </div>
 
+                    {/* Manager Dropdown */}
                     <div className="form-group">
                         <label>Manager</label>
                         <select {...register("managerId", { required: "Manager is required" })}>
@@ -111,6 +127,7 @@ const AddProject = () => {
                         {errors.managerId && <p className="error">{errors.managerId.message}</p>}
                     </div>
 
+                    {/* Dates: Start and Completion */}
                     <div className="form-row">
                         <div className="form-group">
                             <label>Start Date</label>
@@ -131,6 +148,7 @@ const AddProject = () => {
                         </div>
                     </div>
 
+                    {/* File Upload */}
                     <div className="form-group">
                         <label>Upload File</label>
                         <input
@@ -140,6 +158,7 @@ const AddProject = () => {
                         {errors.file && <p className="error">{errors.file.message}</p>}
                     </div>
 
+                    {/* Project Status */}
                     <div className="form-group">
                         <label>Status</label>
                         <select {...register("status", { required: "Status is required" })}>
@@ -150,6 +169,7 @@ const AddProject = () => {
                         {errors.status && <p className="error">{errors.status.message}</p>}
                     </div>
 
+                    {/* Submit Button */}
                     <div className="btn-container">
                         <button type="submit" className="btn-submit">Submit</button>
                     </div>

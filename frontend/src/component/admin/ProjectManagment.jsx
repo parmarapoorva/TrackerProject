@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { FaPlus, FaUsers, FaCogs, FaCalendarAlt, FaTimes, FaUserPlus, FaFolderOpen } from "react-icons/fa";
 import "./ProjectManagement.css";
 
+const API_BASE_URL = "https://trackerproject-backend.onrender.com";  // Render backend URL
+
 const ProjectManagement = () => {
     const [projects, setProjects] = useState([]);
     const [expandedProject, setExpandedProject] = useState(null);
@@ -24,7 +26,7 @@ const ProjectManagement = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get("http://localhost:9000/api/projects/all-projects");
+            const response = await axios.get(`${API_BASE_URL}/api/projects/all-projects`);
             setProjects(response.data);
         } catch (error) {
             console.error("Error fetching projects:", error);
@@ -33,7 +35,7 @@ const ProjectManagement = () => {
 
     const fetchTeamMembers = async (projectId) => {
         try {
-            const response = await axios.get(`http://localhost:9000/api/project-team/all-members/${projectId}`);
+            const response = await axios.get(`${API_BASE_URL}/api/project-team/all-members/${projectId}`);
             setTeamMembers((prev) => ({
                 ...prev,
                 [projectId]: response.data || []
@@ -45,7 +47,7 @@ const ProjectManagement = () => {
 
     const fetchProjectModules = async (projectId) => {
         try {
-            const response = await axios.get(`http://localhost:9000/api/module/project-modules/${projectId}`);
+            const response = await axios.get(`${API_BASE_URL}/api/module/project-modules/${projectId}`);
             setModules((prev) => ({
                 ...prev,
                 [projectId]: response.data.modules || []
@@ -71,7 +73,7 @@ const ProjectManagement = () => {
             return;
         }
         try {
-            await axios.post("http://localhost:9000/api/project-team/add-member", { projectId, email: newMemberEmail });
+            await axios.post(`${API_BASE_URL}/api/project-team/add-member`, { projectId, email: newMemberEmail });
             await fetchTeamMembers(projectId);
             setNewMemberEmail("");
             alert("Team member added successfully!");
@@ -90,7 +92,7 @@ const ProjectManagement = () => {
         }
 
         try {
-            await axios.post("http://localhost:9000/api/module/project-modules", {
+            await axios.post(`${API_BASE_URL}/api/module/project-modules`, {
                 projectId,
                 moduleName,
                 description,
@@ -167,11 +169,11 @@ const ProjectManagement = () => {
 
             <div className="row">
                 {projects.map((project) => (
-                    <div className="col-lg-4 mb-4 " key={project._id}>
+                    <div className="col-lg-4 mb-4" key={project._id}>
                         <div className="card project-card shadow-lg">
                             <div className="card-body">
                                 <h5 className="card-title">{project.pname ?? "No Project Name"}</h5>
-                                <br/>
+                                <br />
                                 <p className="text-muted">{project.description ?? "No description"}</p>
                                 <div className="d-flex justify-content-between">
                                     <span><FaCalendarAlt /> Start: {project.startDate ? new Date(project.startDate).toLocaleDateString() : "N/A"}</span>
@@ -184,7 +186,7 @@ const ProjectManagement = () => {
                                     className={`btn btn-${expandedProject === project._id ? "danger" : "info"} btn-sm mt-3`}
                                     onClick={() => toggleDetails(project._id)}
                                 >
-                                    {expandedProject === project._id ? <FaTimes /> : <FaPlus />} 
+                                    {expandedProject === project._id ? <FaTimes /> : <FaPlus />}
                                     {expandedProject === project._id ? " Hide Details" : " View Details"}
                                 </button>
 

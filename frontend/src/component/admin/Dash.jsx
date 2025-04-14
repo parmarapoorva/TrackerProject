@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { CheckCircle, Briefcase, AlertCircle, Users, Folder, Calendar } from "lucide-react";
+import { Users, Folder, AlertCircle, Calendar } from "lucide-react";
 import { LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, CartesianGrid } from "recharts";
 import "./Dash.css";
+
+const API_BASE_URL = "https://trackerproject-backend.onrender.com";  // Render backend URL
 
 export default function Dash() {
   const [users, setUsers] = useState([]);
@@ -14,15 +16,16 @@ export default function Dash() {
     const fetchData = async () => {
       try {
         const [usersResponse, projectsResponse] = await Promise.all([
-          axios.get("http://localhost:9000/api/users/users", { withCredentials: true }),
-          axios.get("http://localhost:9000/api/projects/all-projects", { withCredentials: true }),
+          axios.get(`${API_BASE_URL}/api/users/users`, { withCredentials: true }),
+          axios.get(`${API_BASE_URL}/api/projects/all-projects`, { withCredentials: true }),
         ]);
+
         setUsers(usersResponse.data);
         setProjects(projectsResponse.data);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError("Failed to load data.");
+        setError("Failed to load data. Please try again later.");
         setLoading(false);
       }
     };
@@ -30,14 +33,36 @@ export default function Dash() {
     fetchData();
   }, []);
 
-  // Sample Chart Data
-  const data = [
-    { day: "Mon", tasks: 2 },
-    { day: "Tue", tasks: 4 },
-    { day: "Wed", tasks: 1 },
-    { day: "Thu", tasks: 5 },
-    { day: "Fri", tasks: 3 },
-  ];
+  // Calculate statistics
+  const overdueTasks = projects.filter(
+    (project) => new Date(project.completionDate) < new Date() && project.status !== "Complete"
+  ).length;
+
+  const upcomingEvents = projects.filter(
+    (project) => new Date(project.startDate) > new Date()
+  ).length;
+
+  // Generate dynamic chart data (Projects added by day)
+  const getChartData = () => {
+    const today = new Date();
+    const chartData = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const day = new Date(today);
+      day.setDate(today.getDate() - i);
+
+      const dayLabel = day.toLocaleDateString("en-US", { weekday: "short" });
+      const projectsOnDay = projects.filter(
+        (project) => new Date(project.startDate).toDateString() === day.toDateString()
+      ).length;
+
+      chartData.push({ day: dayLabel, projects: projectsOnDay });
+    }
+
+    return chartData;
+  };
+
+  const chartData = getChartData();
 
   return (
     <div className="dashboard-container">
@@ -78,7 +103,7 @@ export default function Dash() {
             <div className="card">
               <div className="card-icon overdue-icon"><AlertCircle size={40} /></div>
               <div className="card-info">
-                <h3>3</h3>
+                <h3>{overdueTasks}</h3>
                 <p>Overdue Tasks</p>
               </div>
             </div>
@@ -87,7 +112,7 @@ export default function Dash() {
             <div className="card">
               <div className="card-icon events-icon"><Calendar size={40} /></div>
               <div className="card-info">
-                <h3>5</h3>
+                <h3>{upcomingEvents}</h3>
                 <p>Upcoming Events</p>
               </div>
             </div>
@@ -95,14 +120,14 @@ export default function Dash() {
 
           {/* Line Chart */}
           <div className="chart-container">
-            <h2>Tasks Completed Over the Week</h2>
+            <h2>Projects Created Over the Week</h2>
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={data}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="tasks" stroke="#4CAF50" strokeWidth={3} />
+                <Line type="monotone" dataKey="projects" stroke="#4CAF50" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
           </div>

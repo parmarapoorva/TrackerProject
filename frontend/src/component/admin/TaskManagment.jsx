@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
+const API_URL = "https://trackerproject-backend.onrender.com";
+
 export default function TaskManagement() {
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
@@ -28,15 +30,15 @@ export default function TaskManagement() {
 
   // ✅ Fetch initial data on load
   useEffect(() => {
-    axios.get("http://localhost:9000/api/tasks")
+    axios.get(`${API_URL}/api/tasks`)
       .then((res) => setTasks(res.data.tasks))
       .catch((error) => console.error("Error fetching tasks:", error));
 
-    axios.get("http://localhost:9000/api/projects/all-projects")
+    axios.get(`${API_URL}/api/projects/all-projects`)
       .then((res) => setProjects(res.data))
       .catch((error) => console.error("Error fetching projects:", error));
 
-    axios.get("http://localhost:9000/api/statuses")
+    axios.get(`${API_URL}/api/statuses`)
       .then((res) => setStatuses(res.data))
       .catch((error) => console.error("Error fetching statuses:", error));
   }, []);
@@ -44,16 +46,15 @@ export default function TaskManagement() {
   // ✅ Fetch modules related to selected project
   const fetchModules = (projectId) => {
     if (projectId) {
-      axios.get(`http://localhost:9000/api/module/project-modules/${projectId}`)
+      axios.get(`${API_URL}/api/module/project-modules/${projectId}`)
         .then((res) => {
-          console.log("Modules response:", res.data);  // 👈 Check the response structure
+          console.log("Modules response:", res.data);
           setModules(Array.isArray(res.data) ? res.data : res.data.modules || []);
         })
         .catch((error) => {
           console.error("Error fetching modules:", error);
-          setModules([]);  // 👈 Ensure it falls back to an empty array
+          setModules([]);
         });
-
     }
   };
 
@@ -78,7 +79,7 @@ export default function TaskManagement() {
   const handleDelete = (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this task?");
     if (confirmDelete) {
-      axios.delete(`http://localhost:9000/api/tasks/${id}`)
+      axios.delete(`${API_URL}/api/tasks/${id}`)
         .then(() => {
           setTasks(tasks.filter((task) => task._id !== id));
         })
@@ -91,11 +92,11 @@ export default function TaskManagement() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:9000/api/tasks", newTask);
+      await axios.post(`${API_URL}/api/tasks`, newTask);
       setShowModal(false);
 
       // ✅ Refresh the task list
-      const response = await axios.get("http://localhost:9000/api/tasks");
+      const response = await axios.get(`${API_URL}/api/tasks`);
       setTasks(response.data.tasks);
 
       // ✅ Clear the form
@@ -215,17 +216,6 @@ export default function TaskManagement() {
             </Form.Group>
 
             <Form.Group className="mt-2">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                name="description" 
-                value={newTask.description}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-
-            <Form.Group className="mt-2">
               <Form.Label>Project</Form.Label>
               <Form.Select name="projectId" onChange={handleChange} required>
                 <option value="">Select Project</option>
@@ -233,31 +223,6 @@ export default function TaskManagement() {
                   <option key={p._id} value={p._id}>
                     {p.pname}
                   </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group className="mt-2">
-              <Form.Label>Module</Form.Label>
-              <Form.Select name="moduleId" onChange={handleChange} required>
-                <option value="">Select Module</option>
-                {modules.map((m) => (
-                  <option key={m._id} value={m._id}>{m.moduleName}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group className="mt-2">
-              <Form.Label>Total Minutes</Form.Label>
-              <Form.Control type="number" name="totalMinutes" value={newTask.totalMinutes} onChange={handleChange} required />
-            </Form.Group>
-
-            <Form.Group className="mt-2">
-              <Form.Label>Status</Form.Label>
-              <Form.Select name="statusId" onChange={handleChange} required>
-                <option value="">Select Status</option>
-                {statuses.map((s) => (
-                  <option key={s._id} value={s._id}>{s.statusName}</option>
                 ))}
               </Form.Select>
             </Form.Group>

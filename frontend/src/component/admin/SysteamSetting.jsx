@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Card, Alert, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
-import { FaSave, FaLock, FaUserCog, FaPalette, FaClock } from "react-icons/fa";
-import "./sysyemsetting.css"
+import { FaSave, FaLock, FaUserCog, FaPalette } from "react-icons/fa";
+import axios from "axios";
+import "./sysyemsetting.css";
+
+const API_BASE_URL = "https://trackerproject-backend.onrender.com";
+
 const SysteamSetting = () => {
   const [systemName, setSystemName] = useState("Project Manager");
   const [theme, setTheme] = useState("light");
@@ -10,11 +14,36 @@ const SysteamSetting = () => {
   const [notifications, setNotifications] = useState(true);
   const [twoFactor, setTwoFactor] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSave = () => {
-    // Mock save function
-    setMessage("Settings saved successfully!");
-    setTimeout(() => setMessage(""), 3000);
+  const handleSave = async () => {
+    const settingsData = {
+      systemName,
+      theme,
+      language,
+      timezone,
+      notifications,
+      twoFactor,
+    };
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/system/settings`, settingsData);
+      
+      if (response.status === 200) {
+        setMessage("✅ Settings saved successfully!");
+        setError("");
+      } else {
+        setError("❌ Failed to save settings. Please try again.");
+      }
+    } catch (err) {
+      console.error("API Error:", err);
+      setError("❌ Error connecting to the server.");
+    }
+
+    setTimeout(() => {
+      setMessage("");
+      setError("");
+    }, 3000);
   };
 
   return (
@@ -22,6 +51,7 @@ const SysteamSetting = () => {
       <h2 className="text-center mb-4">⚙️ System Settings</h2>
 
       {message && <Alert variant="success">{message}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>}
 
       <Row className="g-4">
         {/* General Settings */}
@@ -32,10 +62,10 @@ const SysteamSetting = () => {
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>System Name</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    value={systemName} 
-                    onChange={(e) => setSystemName(e.target.value)} 
+                  <Form.Control
+                    type="text"
+                    value={systemName}
+                    onChange={(e) => setSystemName(e.target.value)}
                   />
                 </Form.Group>
 
@@ -47,8 +77,12 @@ const SysteamSetting = () => {
                     value={theme}
                     onChange={setTheme}
                   >
-                    <ToggleButton id="light-theme" value="light" variant="outline-primary">Light</ToggleButton>
-                    <ToggleButton id="dark-theme" value="dark" variant="outline-dark">Dark</ToggleButton>
+                    <ToggleButton id="light-theme" value="light" variant="outline-primary">
+                      Light
+                    </ToggleButton>
+                    <ToggleButton id="dark-theme" value="dark" variant="outline-dark">
+                      Dark
+                    </ToggleButton>
                   </ToggleButtonGroup>
                 </Form.Group>
 
@@ -68,8 +102,8 @@ const SysteamSetting = () => {
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Language</Form.Label>
-                  <Form.Select 
-                    value={language} 
+                  <Form.Select
+                    value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                   >
                     <option value="en">English</option>
@@ -81,10 +115,10 @@ const SysteamSetting = () => {
 
                 <Form.Group className="mb-3">
                   <Form.Label>Timezone</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    value={timezone} 
-                    onChange={(e) => setTimezone(e.target.value)} 
+                  <Form.Control
+                    type="text"
+                    value={timezone}
+                    onChange={(e) => setTimezone(e.target.value)}
                   />
                 </Form.Group>
 
