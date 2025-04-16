@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import "./ProjectManagment.css"
-const ProjectManagement = () => {
+
+const Project = () => {
     const [projects, setProjects] = useState([]);
     const [expandedProject, setExpandedProject] = useState(null);
-    const [teamMembers, setTeamMembers] = useState({});
     const [modules, setModules] = useState({});
+    const [tasks, setTasks] = useState({});
     const [error, setError] = useState("");
 
     const user = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
-    const managerId = user?.role === "Manager" ? user.id : null;
-
+    const developerId = user?.role === "Developer" ? user.id : null;
 
     useEffect(() => {
-        console.log("🔍 Manager ID from localStorage:", managerId); // 👈 log here
-    
-        if (managerId && token) {
+        console.log("🔍 Developer ID from localStorage:", developerId);
+
+        if (developerId && token) {
             fetchAssignedProjects();
         }
-    }, [managerId]);
-    
+    }, [developerId, token]);
 
     const fetchAssignedProjects = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:9000/api/projects/manager-projects/${managerId}`,
+                `http://localhost:9000/api/project-team/developer/${developerId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -47,31 +45,11 @@ const ProjectManagement = () => {
             setExpandedProject(null);
         } else {
             setExpandedProject(projectId);
-            await fetchTeamMembers(projectId);
             await fetchProjectModules(projectId);
+            await fetchProjectTasks(projectId);
         }
     };
 
-    const fetchTeamMembers = async (projectId) => {
-        try {
-            const response = await axios.get(
-                `http://localhost:9000/api/project-team/all-members/${projectId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            console.log("👥 Team members fetched:", response.data); // ✅ ADD THIS
-            setTeamMembers((prev) => ({
-                ...prev,
-                [projectId]: response.data || [],
-            }));
-        } catch (error) {
-            console.error("❌ Error fetching team members:", error);
-        }
-    };
-    
     const fetchProjectModules = async (projectId) => {
         try {
             const response = await axios.get(
@@ -82,7 +60,7 @@ const ProjectManagement = () => {
                     },
                 }
             );
-            console.log("📌 Modules fetched:", response.data); // ✅ ADD THIS
+            console.log("📌 Modules fetched:", response.data);
             setModules((prev) => ({
                 ...prev,
                 [projectId]: response.data.modules || [],
@@ -91,7 +69,27 @@ const ProjectManagement = () => {
             console.error("❌ Error fetching modules:", error);
         }
     };
-    
+
+    const fetchProjectTasks = async (projectId) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:9000/api/tasks/project/${projectId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            console.log("🧩 Tasks fetched:", response.data);
+            setTasks((prev) => ({
+                ...prev,
+                [projectId]: response.data || [],
+            }));
+        } catch (error) {
+            console.error("❌ Error fetching tasks:", error);
+        }
+    };
+
     return (
         <div className="container mt-4" style={{
             maxHeight: "100%",
@@ -103,7 +101,7 @@ const ProjectManagement = () => {
         }}>
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h2>📁 Assigned Projects</h2>
-                <Link to="/manager-dashboard" className="btn btn-info">⬅️ Back to Dashboard</Link>
+                <Link to="/developer-dashboard" className="btn btn-info">⬅️ Back to Dashboard</Link>
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
@@ -126,22 +124,28 @@ const ProjectManagement = () => {
 
                                     {expandedProject === project._id && (
                                         <div className="mt-3">
-                                            <h6>👥 Team Members</h6>
-                                            <ul className="list-group">
-                                                {teamMembers[project._id]?.map((member) => (
-                                                    <li key={member._id} className="list-group-item">
-                                                        {member.name} ({member.email})
-                                                    </li>
-                                                ))}
-                                            </ul>
-
                                             <h6 className="mt-3">📌 Project Modules</h6>
                                             <ul className="list-group">
                                                 {modules[project._id]?.map((module) => (
                                                     <li key={module._id} className="list-group-item">
-                                                        {module.moduleName} - {module.status} ({module.estimatedHours} hrs)
+                                                        <strong>{module.moduleName}</strong> - {module.status} ({module.estimatedHours} hrs)
                                                     </li>
                                                 ))}
+                                            </ul>
+
+                                            <h6 className="mt-3">🧩 Project Tasks</h6>
+                                            <ul className="list-group">
+                                                {tasks[project._id]?.length > 0 ? (
+                                                    tasks[project._id].map((task) => (
+                                                        <li key={task._id} className="list-group-item">
+                                                            <strong>{task.title}</strong> - {task.status} ({task.priority})<br />
+                                                            Due: {new Date(task.dueDate).toLocaleDateString()} <br />
+                                                            ⏳ Estimated Hours: {task.totalMinutes || "N/A"}
+                                                        </li>
+                                                    ))
+                                                ) : (
+                                                    <li className="list-group-item text-muted">No tasks found.</li>
+                                                )}
                                             </ul>
                                         </div>
                                     )}
@@ -157,4 +161,4 @@ const ProjectManagement = () => {
     );
 };
 
-export default ProjectManagement;
+export default Project;

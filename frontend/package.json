@@ -20,11 +20,13 @@
     "@react-three/fiber": "^9.1.0",
     "@shadcn/ui": "^0.0.4",
     "admin-lte": "^4.0.0-beta3",
+    "autoprefixer": "^10.4.21",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "fontawesome": "^5.6.3",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.477.0",
+    "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
@@ -34,6 +36,7 @@
     "react-router-dom": "^7.1.5",
     "react-toastify": "^11.0.3",
     "recharts": "^2.15.1",
+    "tailwindcss": "^4.0.17",
     "three": "^0.174.0"
   },
   "devDependencies": {

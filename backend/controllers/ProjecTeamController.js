@@ -34,21 +34,15 @@ exports.addProjectTeamMember = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Find project team
+        // Find project team, or create one if it doesn't exist
         let projectTeam = await ProjectTeam.findOne({ projectId });
 
-        // If no project team exists, create a new one
         if (!projectTeam) {
             console.warn("⚠️ Project team not found, creating a new one...");
-            projectTeam = new ProjectTeam({ projectId, members: [] });
+            projectTeam = new ProjectTeam({ projectId, members: [], project_team_id: projectId });
         }
 
-        // Ensure `members` array exists
-        if (!projectTeam.members) {
-            projectTeam.members = [];
-        }
-
-        // Check if user is already in the team
+        // Ensure `members` array exists and check if the user is already part of the team
         if (projectTeam.members.includes(user._id)) {
             return res.status(400).json({ error: "User is already in the team" });
         }
@@ -57,7 +51,7 @@ exports.addProjectTeamMember = async (req, res) => {
         projectTeam.members.push(user._id);
         await projectTeam.save();
 
-        console.log("✅ User added successfully:", user._id);
+        console.log("✅ Developer added successfully:", user._id);
         res.status(201).json({
             message: "Member added!",
             member: {
@@ -72,7 +66,6 @@ exports.addProjectTeamMember = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 
 // ✅ Remove a user from a project team
 exports.removeProjectTeamMember = async (req, res) => {

@@ -14,21 +14,18 @@ export default function UserManagement() {
   const [roles, setRoles] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
-  const API_BASE_URL = "https://trackerproject-backend.onrender.com/api";
-
   useEffect(() => {
     fetchUsers();
     fetchRoles();
   }, []);
 
   const fetchUsers = () => {
-    axios
-      .get(`${API_BASE_URL}/users/users`, { withCredentials: true })
-      .then((response) => {
+    axios.get("http://localhost:9000/api/users/users", { withCredentials: true })
+      .then(response => {
         setUsers(response.data);
         setLoading(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error fetching users:", error);
         setError("Failed to load users.");
         setLoading(false);
@@ -36,21 +33,15 @@ export default function UserManagement() {
   };
 
   const fetchRoles = () => {
-    axios
-      .get(`${API_BASE_URL}/roles`)
-      .then((response) => setRoles(response.data))
-      .catch((error) => console.error("Error fetching roles:", error));
+    axios.get("http://localhost:9000/api/roles")
+      .then(response => setRoles(response.data))
+      .catch(error => console.error("Error fetching roles:", error));
   };
 
   const handleAddUser = (e) => {
     e.preventDefault();
-    axios
-      .post(
-        `${API_BASE_URL}/users/signup`,
-        { name, email, password, gender, role },
-        { withCredentials: true }
-      )
-      .then((response) => {
+    axios.post("http://localhost:9000/api/users/signup", { name, email, password, gender, role }, { withCredentials: true })
+      .then(response => {
         setUsers([...users, response.data]);
         setName("");
         setEmail("");
@@ -59,19 +50,18 @@ export default function UserManagement() {
         setRole("");
         setShowForm(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error adding user:", error);
         setError("Failed to add user.");
       });
   };
 
   const handleDeleteUser = (userId) => {
-    axios
-      .delete(`${API_BASE_URL}/users/delete/${userId}`, { withCredentials: true })
+    axios.delete(`http://localhost:9000/api/users/delete/${userId}`, { withCredentials: true })
       .then(() => {
-        setUsers(users.filter((user) => user._id !== userId));
+        setUsers(users.filter(user => user._id !== userId));
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error deleting user:", error);
         setError("Failed to delete user.");
       });
@@ -79,6 +69,7 @@ export default function UserManagement() {
 
   return (
     <div className="content">
+      
       {/* ✅ Header Section */}
       <div className="user-management-header">
         <h1>👥 User Management</h1>
@@ -92,34 +83,34 @@ export default function UserManagement() {
         <form className="user-form" onSubmit={handleAddUser}>
           <div className="form-group">
             <label>Name:</label>
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+            <input 
+              type="text" 
+              placeholder="Full Name" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              required 
             />
           </div>
 
           <div className="form-group">
             <label>Email:</label>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
             />
           </div>
 
           <div className="form-group">
             <label>Password:</label>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
             />
           </div>
 
@@ -137,17 +128,13 @@ export default function UserManagement() {
             <label>Role:</label>
             <select value={role} onChange={(e) => setRole(e.target.value)} required>
               <option value="">Select Role</option>
-              {roles.map((r) => (
-                <option key={r._id} value={r._id}>
-                  {r.name}
-                </option>
+              {roles.map(r => (
+                <option key={r._id} value={r._id}>{r.name}</option>
               ))}
             </select>
           </div>
 
-          <button type="submit" className="btn-submit">
-            Add User
-          </button>
+          <button type="submit" className="btn-submit">Add User</button>
         </form>
       )}
 
@@ -179,8 +166,8 @@ export default function UserManagement() {
                     <td>{user.gender}</td>
                     <td>{user.roleName}</td>
                     <td>
-                      <button
-                        className="btn-delete"
+                      <button 
+                        className="btn-delete" 
                         onClick={() => handleDeleteUser(user._id)}
                       >
                         🗑️ Delete
@@ -190,9 +177,7 @@ export default function UserManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center">
-                    No users found.
-                  </td>
+                  <td colSpan="6" className="text-center">No users found.</td>
                 </tr>
               )}
             </tbody>

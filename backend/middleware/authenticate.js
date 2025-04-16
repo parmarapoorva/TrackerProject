@@ -5,28 +5,28 @@ dotenv.config();
 // ✅ Improved Authentication Middleware
 const authenticate = (req, res, next) => {
     try {
-        // 🔥 Extract token from Authorization header
         const authHeader = req.headers.authorization;
+        console.log("🟡 Incoming Authorization Header:", authHeader); // ✅ Add this
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.log("⛔ No token or bad format");
             return res.status(401).json({ message: "No token provided or invalid format" });
         }
 
         const token = authHeader.split(' ')[1];
+        console.log("🔑 Extracted Token:", token); // ✅ Add this
 
-        // ✅ Verify the token
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
                 console.error("🔴 Authentication error:", err.message);
-
                 if (err.name === "TokenExpiredError") {
                     return res.status(401).json({ message: "Token expired" });
                 }
-
                 return res.status(403).json({ message: "Invalid token" });
             }
 
-            req.user = decoded;  // Attach decoded user info to request
+            console.log("✅ Token Verified. Decoded:", decoded); // ✅ Add this
+            req.user = decoded;
             next();
         });
 

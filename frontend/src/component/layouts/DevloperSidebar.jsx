@@ -1,127 +1,67 @@
-import React from 'react'
-// import {UserNavbar} from './UserNavbar'
-import { Outlet } from 'react-router-dom'
-import { DeveloperNavbar } from './DeveloperNavbar'
+import React, { useEffect, useState } from 'react';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { DeveloperNavbar } from './DeveloperNavbar';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faProjectDiagram, faSignOutAlt, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 
 export default function DeveloperSidebar() {
+  const navigate = useNavigate();
+  const [developer, setDeveloper] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setDeveloper(storedUser);
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   return (
-     <>
-     <DeveloperNavbar></DeveloperNavbar>
-    <aside
-    
-        className="app-sidebar bg-body-secondary shadow"
-        data-bs-theme="dark"
-      >
-        <div className="sidebar-brand">
-          
-          <a href="./index.html" className="brand-link">
-            
-            {/* <img
-              src="../../dist/assets/img/AdminLTELogo.png"
-              alt="AdminLTE Logo"
-              className="brand-image opacity-75 shadow"
-            /> */}
-            
-            <span className="brand-text fw-light">AdminLTE 4</span>
-            
-          </a>
-          
+    <>
+      <DeveloperNavbar />
+
+      <aside className="app-sidebar bg-body-secondary shadow" data-bs-theme="light">
+        <div className="sidebar-brand text-center p-3 border-bottom">
+          <FontAwesomeIcon icon={faUserCircle} className="fs-2 text-info me-2" />
+          <Link to="profile" className="fw-bold text-decoration-none text-dark">
+            {developer ? developer.name : "Developer"}
+          </Link>
         </div>
 
-        <div
-          className=""
-          data-overlayscrollbars-viewport="scrollbarHidden overflowXHidden overflowYScroll"
-          tabIndex={-1}
-          style={{
-            marginRight: "-16px",
-            marginBottom: "-16px",
-            marginLeft: 0,
-            top: "-8px",
-            right: "auto",
-            left: "-8px",
-            width: "calc(100% + 16px)",
-            padding: 8,
-          }}
-        >
+        <div className="overflow-auto" style={{ maxHeight: '90vh' }}>
           <nav className="mt-2">
-            
-            <ul
-              className="nav sidebar-menu flex-column"
-              data-lte-toggle="treeview"
-              role="menu"
-              data-accordion="false"
-            >
-              <li className="nav-item menu-open">
-                <a href="#" className="nav-link active">
-                  <i className="nav-icon bi bi-speedometer" />
-                  <p>
-                    Dashboard
-                    <i className="nav-arrow bi bi-chevron-right" />
-                  </p>
-                </a>
-                <ul className="nav nav-treeview">
-                  <li className="nav-item">
-                    <a href="./index.html" className="nav-link active">
-                      <i className="nav-icon bi bi-circle" />
-                      <p>Dashboard v1</p>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="./index2.html" className="nav-link">
-                      <i className="nav-icon bi bi-circle" />
-                      <p>Dashboard v2</p>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="./index3.html" className="nav-link">
-                      <i className="nav-icon bi bi-circle" />
-                      <p>Dashboard v3</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+            <ul className="nav sidebar-menu flex-column" role="menu">
+
+              {/* ✅ Projects Section */}
               <li className="nav-item">
-                <a href="./generate/theme.html" className="nav-link">
-                  <i className="nav-icon bi bi-palette" />
-                  <p>Theme Generate</p>
-                </a>
+                <Link to="/developer-dashboard/projectmanagement" className="nav-link">
+                  <FontAwesomeIcon icon={faProjectDiagram} className="nav-icon" />
+                  <p>Projects</p>
+                </Link>
               </li>
+
+              {/* ✅ Logout */}
               <li className="nav-item">
-                <a href="#" className="nav-link">
-                  <i className="nav-icon bi bi-box-seam-fill" />
-                  <p>
-                    Widgets
-                    <i className="nav-arrow bi bi-chevron-right" />
-                  </p>
-                </a>
-                <ul className="nav nav-treeview">
-                  <li className="nav-item">
-                    <a href="./widgets/small-box.html" className="nav-link">
-                      <i className="nav-icon bi bi-circle" />
-                      <p>Small Box</p>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="./widgets/info-box.html" className="nav-link">
-                      <i className="nav-icon bi bi-circle" />
-                      <p>info Box</p>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="./widgets/cards.html" className="nav-link">
-                      <i className="nav-icon bi bi-circle" />
-                      <p>Cards</p>
-                    </a>
-                  </li>
-                </ul>
+                <button onClick={handleLogout} className="nav-link btn btn-link text-danger">
+                  <FontAwesomeIcon icon={faSignOutAlt} className="nav-icon" />
+                  <p>Logout</p>
+                </button>
               </li>
+
             </ul>
-            
           </nav>
         </div>
       </aside>
-      <main className='app-main'>
-        <Outlet></Outlet>
+
+      <main className="app-main">
+        <Outlet />
       </main>
-      </> )
+    </>
+  );
 }

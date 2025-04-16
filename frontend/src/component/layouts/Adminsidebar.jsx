@@ -32,6 +32,85 @@ export default function AdminSidebar() {
 
   return (
     <>
+    <style>{`
+  .app-sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    background-color: #1e1e2f;
+    color: #ddd;
+    padding-top: 10px;
+    z-index: 1000;
+    border-right: 1px solid #2c2c3a;
+  }
+
+  .app-sidebar .sidebar-brand {
+    background-color: #27293d;
+    color: #fff;
+    font-size: 1.1rem;
+  }
+
+  .sidebar-menu {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .sidebar-menu .nav-item {
+    margin: 5px 0;
+  }
+
+  .sidebar-menu .nav-link {
+    display: flex;
+    align-items: center;
+    color: #cfd8dc;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+  }
+
+  .sidebar-menu .nav-link:hover,
+  .sidebar-menu .nav-link.active {
+    background-color: #39414f;
+    color: #fff;
+  }
+
+  .sidebar-menu .nav-link p {
+    margin: 0;
+    margin-left: 10px;
+    font-size: 0.95rem;
+    flex: 1;
+  }
+
+  .sidebar-menu .nav-icon {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+  }
+
+  .nav-link.btn {
+    text-align: left;
+    width: 100%;
+  }
+
+  .app-main {
+    margin-left: 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    .app-sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .app-main {
+      margin-left: 0;
+    }
+  }
+`}</style>
+
       <Adminnavbar />
       <aside className="app-sidebar bg-body-secondary shadow mt-2" data-bs-theme="light">
         {/* ✅ Admin Info */}
@@ -72,20 +151,6 @@ export default function AdminSidebar() {
               </Link>
             </li>
 
-            <li className="nav-item">
-              <Link to="/admin-dashboard/reports" className="nav-link">
-                <FontAwesomeIcon icon={faChartBar} className="nav-icon" />
-                <p>Performance Reports</p>
-              </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link to="/admin-dashboard/resources" className="nav-link">
-                <FontAwesomeIcon icon={faProjectDiagram} className="nav-icon" />
-                <p>Resource Allocation</p>
-              </Link>
-            </li>
-
             
 
             <li className="nav-item">
@@ -95,12 +160,7 @@ export default function AdminSidebar() {
               </Link>
             </li>
 
-            <li className="nav-item">
-              <Link to="/admin-dashboard/change-password" className="nav-link">
-                <FontAwesomeIcon icon={faKey} className="nav-icon" />
-                <p>Change Password</p>
-              </Link>
-            </li>
+            
 
             {/* ✅ Logout Button */}
             <li className="nav-item">

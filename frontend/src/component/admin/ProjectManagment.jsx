@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { FaPlus, FaUsers, FaCogs, FaCalendarAlt, FaTimes, FaUserPlus, FaFolderOpen } from "react-icons/fa";
+import {
+    FaPlus, FaUsers, FaCogs, FaCalendarAlt, FaUserPlus, FaFolderOpen, FaTrash
+} from "react-icons/fa";
 import "./ProjectManagement.css";
-
-const API_BASE_URL = "https://trackerproject-backend.onrender.com";  // Render backend URL
 
 const ProjectManagement = () => {
     const [projects, setProjects] = useState([]);
-    const [expandedProject, setExpandedProject] = useState(null);
     const [teamMembers, setTeamMembers] = useState({});
     const [modules, setModules] = useState({});
     const [newMemberEmail, setNewMemberEmail] = useState("");
+    const [developers, setDevelopers] = useState([]);
     const [newModule, setNewModule] = useState({
         moduleName: "",
         description: "",
@@ -20,22 +20,35 @@ const ProjectManagement = () => {
         startDate: ""
     });
 
+    const [showModal, setShowModal] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
+
     useEffect(() => {
         fetchProjects();
+        fetchDevelopers();
     }, []);
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/projects/all-projects`);
+            const response = await axios.get("http://localhost:9000/api/projects/all-projects");
             setProjects(response.data);
         } catch (error) {
             console.error("Error fetching projects:", error);
         }
     };
 
+    const fetchDevelopers = async () => {
+        try {
+            const response = await axios.get("http://localhost:9000/api/users/Developer");
+            setDevelopers(response.data);
+        } catch (error) {
+            console.error("Error fetching developers:", error);
+        }
+    };
+
     const fetchTeamMembers = async (projectId) => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/project-team/all-members/${projectId}`);
+            const response = await axios.get(`http://localhost:9000/api/project-team/all-members/${projectId}`);
             setTeamMembers((prev) => ({
                 ...prev,
                 [projectId]: response.data || []
@@ -47,7 +60,7 @@ const ProjectManagement = () => {
 
     const fetchProjectModules = async (projectId) => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/module/project-modules/${projectId}`);
+            const response = await axios.get(`http://localhost:9000/api/module/project-modules/${projectId}`);
             setModules((prev) => ({
                 ...prev,
                 [projectId]: response.data.modules || []
@@ -57,29 +70,34 @@ const ProjectManagement = () => {
         }
     };
 
-    const toggleDetails = async (projectId) => {
-        if (expandedProject === projectId) {
-            setExpandedProject(null);
-        } else {
-            setExpandedProject(projectId);
-            await fetchTeamMembers(projectId);
-            await fetchProjectModules(projectId);
-        }
+    const openDetailsModal = async (project) => {
+        setSelectedProject(project);
+        await fetchTeamMembers(project._id);
+        await fetchProjectModules(project._id);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setSelectedProject(null);
     };
 
     const addTeamMember = async (projectId) => {
         if (!newMemberEmail) {
-            alert("Please enter an email.");
+            alert("Please select a developer.");
             return;
         }
+
         try {
-            await axios.post(`${API_BASE_URL}/api/project-team/add-member`, { projectId, email: newMemberEmail });
+            await axios.post("http://localhost:9000/api/project-team/add-member", {
+                projectId,
+                email: newMemberEmail
+            });
             await fetchTeamMembers(projectId);
             setNewMemberEmail("");
             alert("Team member added successfully!");
         } catch (error) {
-            console.error("Error adding team member:", error);
-            alert("Failed to add member.");
+            alert(error.response?.data?.message || "Failed to add member.");
         }
     };
 
@@ -92,7 +110,7 @@ const ProjectManagement = () => {
         }
 
         try {
-            await axios.post(`${API_BASE_URL}/api/module/project-modules`, {
+            await axios.post("http://localhost:9000/api/module/project-modules", {
                 projectId,
                 moduleName,
                 description,
@@ -112,8 +130,21 @@ const ProjectManagement = () => {
 
             alert("Module added successfully!");
         } catch (error) {
-            console.error("Error adding module:", error);
             alert("Failed to add module.");
+        }
+    };
+
+    const deleteProject = async (projectId) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this project?");
+        if (!confirmDelete) return;
+
+        try {
+            await axios.delete(`http://localhost:9000/api/projects/delete-project/${projectId}`);
+            alert("Project deleted successfully!");
+            fetchProjects();
+        } catch (error) {
+            console.error("Error deleting project:", error);
+            alert("Failed to delete project.");
         }
     };
 
@@ -132,12 +163,32 @@ const ProjectManagement = () => {
                 ) : (
                     <p className="text-muted">No team members assigned.</p>
                 )}
+
+                <div className="mt-3">
+                    <h6><FaUserPlus /> Add Team Member</h6>
+                    <select
+                        className="form-control mb-2"
+                        value={newMemberEmail}
+                        onChange={(e) => setNewMemberEmail(e.target.value)}
+                    >
+                        <option value="">-- Select Developer --</option>
+                        {developers.map((dev) => (
+                            <option key={dev._id} value={dev.email}>
+                                {dev.name} ({dev.email})
+                            </option>
+                        ))}
+                    </select>
+
+                    <button className="btn btn-primary btn-sm" onClick={() => addTeamMember(projectId)}>
+                        Add Developer
+                    </button>
+                </div>
             </div>
         </div>
     );
 
     const renderModules = (projectId) => (
-        <div className="mt-3">
+        <div className="mt-4">
             <h6 className="text-success"><FaCogs /> Project Modules</h6>
             <div className="border rounded p-3 bg-light">
                 {modules[projectId]?.length > 0 ? (
@@ -174,6 +225,15 @@ const ProjectManagement = () => {
                             <div className="card-body">
                                 <h5 className="card-title">{project.pname ?? "No Project Name"}</h5>
                                 <br />
+                                <span
+  className={`status-badge ${
+    project.status?.toLowerCase() === "working" ? "status-working" : "status-other"
+  }`}
+>
+  {project.status ?? "No status found"}
+</span>
+
+                               
                                 <p className="text-muted">{project.description ?? "No description"}</p>
                                 <div className="d-flex justify-content-between">
                                     <span><FaCalendarAlt /> Start: {project.startDate ? new Date(project.startDate).toLocaleDateString() : "N/A"}</span>
@@ -182,32 +242,112 @@ const ProjectManagement = () => {
                                 <p className="mt-2"><strong>Tech:</strong> {project.technology ?? "N/A"}</p>
                                 <p><strong>Manager:</strong> {project.manager?.name ?? "No Manager Assigned"}</p>
 
-                                <button
-                                    className={`btn btn-${expandedProject === project._id ? "danger" : "info"} btn-sm mt-3`}
-                                    onClick={() => toggleDetails(project._id)}
-                                >
-                                    {expandedProject === project._id ? <FaTimes /> : <FaPlus />}
-                                    {expandedProject === project._id ? " Hide Details" : " View Details"}
-                                </button>
-
-                                {expandedProject === project._id && (
-                                    <div className="mt-3 p-3 bg-light rounded border">
-                                        {renderTeamMembers(project._id)}
-                                        {renderModules(project._id)}
-
-                                        <h6 className="mt-4">Add New Module</h6>
-                                        <input type="text" placeholder="Module Name" value={newModule.moduleName} onChange={(e) => setNewModule({ ...newModule, moduleName: e.target.value })} className="form-control mb-2" />
-                                        <input type="number" placeholder="Estimated Hours" value={newModule.estimatedHours} onChange={(e) => setNewModule({ ...newModule, estimatedHours: e.target.value })} className="form-control mb-2" />
-                                        <input type="date" value={newModule.startDate} onChange={(e) => setNewModule({ ...newModule, startDate: e.target.value })} className="form-control mb-2" />
-                                        <textarea placeholder="Description" value={newModule.description} onChange={(e) => setNewModule({ ...newModule, description: e.target.value })} className="form-control mb-2"></textarea>
-                                        <button className="btn btn-success" onClick={() => addModule(project._id)}>Add Module</button>
-                                    </div>
-                                )}
+                                <div className="d-flex justify-content-between mt-3">
+                                    <button
+                                        className="btn btn-info btn-sm"
+                                        onClick={() => openDetailsModal(project)}
+                                    >
+                                        <FaPlus /> View Details
+                                    </button>
+                                    <button
+                                        className="btn btn-danger btn-sm"
+                                        onClick={() => deleteProject(project._id)}
+                                    >
+                                        <FaTrash /> Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Modal */}
+            {selectedProject && (
+                <div className={`modal fade ${showModal ? "show d-block" : ""}`} tabIndex="-1">
+                    <div className="modal-dialog modal-xl modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    Project: {selectedProject.pname}
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={closeModal}
+                                ></button>
+                            </div>
+                            <div className="modal-body">
+                                {renderTeamMembers(selectedProject._id)}
+                                {renderModules(selectedProject._id)}
+
+                                <div className="mt-4">
+                                    <h6>Add New Module</h6>
+                                    <input
+                                        type="text"
+                                        placeholder="Module Name"
+                                        value={newModule.moduleName}
+                                        onChange={(e) =>
+                                            setNewModule({ ...newModule, moduleName: e.target.value })
+                                        }
+                                        className="form-control mb-2"
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Estimated Hours"
+                                        value={newModule.estimatedHours}
+                                        onChange={(e) =>
+                                            setNewModule({ ...newModule, estimatedHours: e.target.value })
+                                        }
+                                        className="form-control mb-2"
+                                    />
+                                    <input
+                                        type="date"
+                                        value={newModule.startDate}
+                                        onChange={(e) =>
+                                            setNewModule({ ...newModule, startDate: e.target.value })
+                                        }
+                                        className="form-control mb-2"
+                                    />
+                                    <textarea
+                                        placeholder="Description"
+                                        value={newModule.description}
+                                        onChange={(e) =>
+                                            setNewModule({ ...newModule, description: e.target.value })
+                                        }
+                                        className="form-control mb-2"
+                                    ></textarea>
+
+                                    <select
+                                        value={newModule.status}
+                                        onChange={(e) =>
+                                            setNewModule({ ...newModule, status: e.target.value })
+                                        }
+                                        className="form-control mb-3"
+                                    >
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="On Hold">On Hold</option>
+                                    </select>
+
+                                    <button
+                                        className="btn btn-success"
+                                        onClick={() => addModule(selectedProject._id)}
+                                    >
+                                        Add Module
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button className="btn btn-secondary" onClick={closeModal}>
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

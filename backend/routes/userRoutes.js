@@ -5,7 +5,9 @@ const User = require("../models/User");
 const Role = require("../models/role");
 const { sendingMail } = require("../utils/MailUtil");
 const router = express.Router();
-const SECRET_KEY = "your_secret_key"; // 🔒 Replace with a strong secret key
+const crypto = require("crypto");
+
+const SECRET_KEY = "ahemdabad"; // 🔒 Replace with a strong secret key
 router.post("/signup", async (req, res) => {
     try {
         const { name, email, password, role, gender } = req.body;
@@ -156,6 +158,64 @@ router.get("/users", async (req, res) => {
     }
 });
 
+// 🛠️ Forgot Password Route - Send Reset Link
+router.post("/forgot-password", async (req, res) => {
+    try {
+      // Get email from the request body instead of query parameters
+      const email = req.body.email.trim().toLowerCase();
+      const foundUser = await User.findOne({ email });
+    
+      if (foundUser) {
+        // Create a token with the user's object (consider only including necessary data)
+        const token = jwt.sign(foundUser.toObject(), SECRET_KEY);
+        console.log(token);
+        
+        // Construct the reset password URL with the token
+        const url = `http://localhost:5173/resetpassword/${token}`;
+        const mailContent = `<html>
+                                <a href="${url}">Reset Password</a>
+                             </html>`;
+        
+        // Send the reset link via email using the imported sendingMail function
+        await sendingMail(foundUser.email, "Reset Password", mailContent);
+        
+        res.json({ message: "Reset password link sent to mail." });
+      } else {
+        res.json({ message: "User not found. Please register first." });
+      }
+    } catch (error) {
+      console.error("Error in forgot password:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  
+
+
+  router.post("/reset-password/:token", async (req, res) => {
+    const { newPassword } = req.body;
+    const { token } = req.params;
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        console.log("Decoded:", decoded);
+
+        const user = await User.findById(decoded._id); // ✅ FIXED!
+        console.log("Found user:", user);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 12);
+        await user.save();
+
+        res.json({ message: "Password reset successfully" });
+    } catch (error) {
+        console.error("Reset Password Error:", error.message);
+        res.status(400).json({ error: "Invalid or expired token" });
+    }
+});
 
 
 
@@ -173,6 +233,18 @@ router.get("/managers", async (req, res) => {
         const managers = await User.find({ roleName: "Manager" })  // ✅ Use roleName
             .select("name email phone _id roleId");                // ✅ Include roleId
         res.status(200).json(managers);
+    } catch (error) {
+        console.error("Error fetching managers:", error);
+        res.status(500).json({ message: "Failed to fetch managers" });
+    }
+});
+
+
+router.get("/developer", async (req, res) => {
+    try {
+        const developer = await User.find({ roleName: "Developer" })  // ✅ Use roleName
+            .select("name email phone _id roleId");                // ✅ Include roleId
+        res.status(200).json(developer);
     } catch (error) {
         console.error("Error fetching managers:", error);
         res.status(500).json({ message: "Failed to fetch managers" });

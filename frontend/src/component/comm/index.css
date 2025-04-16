@@ -1,0 +1,21 @@
+/* Ensure the app wrapper covers the full screen */
+#root, .app-wrapper {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  /* Make the Welcome page container cover the entire screen */
+  .welcome-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('https://img.freepik.com/premium-vector/magnifying-glass-icon-flat-style-search-loupe-color-background-business-analytic_812194-218.jpg') 
+      no-repeat center center;
+    background-size: cover;
+  }
+  
